@@ -53,7 +53,7 @@ There are `r nrow(q1_part2)` aisles and fresh vegetables are the most ordered fr
 
 Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
 
-```{r}
+```{r count_and_order_2}
 instacart %>% 
   count(aisle) %>% 
   filter(n > 10000) %>% 
@@ -66,5 +66,20 @@ instacart %>%
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
 
+### Part 4 
+
+Make a table showing the three most popular items in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”. Include the number of times each item is ordered in your table.
+
+```{r count_and_order_3}
+instacart %>% 
+  filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
+   group_by(aisle) %>% 
+  count(product_name) %>% 
+  mutate(rank = min_rank(desc(n))) %>% 
+  filter(rank <= 3) %>% 
+  arrange(aisle, rank) %>% 
+  relocate(rank, n) %>% 
+  knitr::kable()
+```
 
 
