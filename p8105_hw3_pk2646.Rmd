@@ -36,4 +36,35 @@ data("instacart")
 
 “The Instacart Online Grocery Shopping Dataset 2017” is an anonymized dataset with `r nrow(instacart)` observations and `r ncol(instacart)` columns. The variable names are `r names(instacart)`. These include names as character variables, and other numeric variables. Key information of interest are products, aisles (contains categorized products) and department (contains categorized aisles).  
 
+### Part 2 
+
+How many aisles are there, and which aisles are the most items ordered from?
+
+```{r count_and_order_1}
+q1_part2 = 
+instacart %>% 
+  count(aisle) %>% 
+  arrange(desc(n)) # arranging in reverse order to know in which aisles are the most items ordered from. 
+```
+
+There are `r nrow(q1_part2)` aisles and fresh vegetables are the most ordered from. 
+
+### Part 3 
+
+Make a plot that shows the number of items ordered in each aisle, limiting this to aisles with more than 10000 items ordered. Arrange aisles sensibly, and organize your plot so others can read it.
+
+```{r}
+instacart %>% 
+  count(aisle) %>% 
+  filter(n > 10000) %>% 
+  mutate(
+    aisle = factor(aisle),
+    aisle = fct_reorder(aisle, n)
+  ) %>% 
+  ggplot(aes(x = aisle, y = n,)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+
 
