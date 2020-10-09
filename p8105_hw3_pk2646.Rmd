@@ -5,5 +5,35 @@ output: github_document
 
 ```{r setup}
 library(tidyverse)
+library(p8105.datasets)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = 0.6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
 ```
+
+## Problem 1 
+
+### Part 1 
+
+Load Instacart dataset.
+
+```{r load_data}
+data("instacart")
+```
+
+“The Instacart Online Grocery Shopping Dataset 2017” is an anonymized dataset with `r nrow(instacart)` observations and `r ncol(instacart)` columns. The variable names are `r names(instacart)`. These include names as character variables, and other numeric variables. Key information of interest are products, aisles (contains categorized products) and department (contains categorized aisles).  
+
 
