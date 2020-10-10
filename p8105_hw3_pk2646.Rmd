@@ -184,7 +184,14 @@ The NOAA dataset contains `r nrow(ny_noaa)` observations and `r ncol(ny_noaa)` v
 ny_noaa_df = (
   ny_noaa %>% 
   janitor::clean_names() %>% 
-  separate(date, into = c("year", "month", "day"), sep = "-"))
+  separate(date, into = c("year", "month", "day"), sep = "-") %>% 
+  mutate(
+    year = as.numeric(year),
+    month = as.numeric(month),
+    day = as.numeric(day),
+    tmax = as.numeric(tmax),
+    tmin = as.numeric(tmin)
+  ))
   # keep all the missing variables for now. 
 ```
 
@@ -197,6 +204,24 @@ ny_noaa_df %>%
 ```
 
 Fo snowfall the three most commonly observed values are 25 (31022 values), 13(23095 values) and 51(18274 values). (Exclusing the times there were no snowfall and the missing values)
+
+### Part 3 
+
+Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
+```{r graph_2}
+ny_noaa_df %>% 
+  filter(month == c(1, 7)) %>%
+  group_by(year, id, month) %>% 
+  drop_na() %>%
+  summarize(max_temp = mean(tmax)) %>% 
+  ggplot(aes(x = year, y = max_temp)) + 
+  geom_point() + 
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ month)
+```
+
+From the graph we can see that the average maximum temperature is higher in July than in January. The lowest average maximum temperature in July is higher than the highest average maximum temperature in January. There are a few outliers but not enough to skewer the general interpretation of the graph. 
 
 
 
