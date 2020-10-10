@@ -6,6 +6,9 @@ output: github_document
 ```{r setup}
 library(tidyverse)
 library(p8105.datasets)
+library(patchwork)
+library(plotly)
+
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -223,8 +226,33 @@ ny_noaa_df %>%
 
 From the graph we can see that the average maximum temperature is higher in July than in January. The lowest average maximum temperature in July is higher than the highest average maximum temperature in January. There are a few outliers but not enough to skewer the general interpretation of the graph. 
 
+### Part 4 
+
+Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 
 
+```{r graph_3}
+plot1 = (
+  ny_noaa_df %>%
+    drop_na() %>% 
+    ggplot(aes(x = tmax, y = tmin)) +
+    geom_hex()
+    )
+
+plot2 = (
+    ny_noaa_df %>% 
+    filter(snow < 100) %>% 
+      filter(snow > 0) %>% 
+      group_by(year) %>% 
+      drop_na() %>% 
+      ggplot(aes( x = month, y = snow)) +
+      geom_violin() +
+      facet_grid(. ~ year)
+        )
+plot1 / plot2
+```
+
+Description - plot2 - It seems like there was more snowfalls in the years 1999 and 1994 compared to others but mostly the snowfall is pretty consistent. 
 
 
 
