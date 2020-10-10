@@ -108,21 +108,32 @@ accel_df = (
   janitor::clean_names() %>% 
     mutate(
       day = as.factor(day),
+      day_id = case_when(
+        day %in% c("Monday") ~ "1",
+        day %in% c("Tuesday") ~ "2",
+        day %in% c("Wednesday") ~ "3",
+        day %in% c("Thursday") ~ "4",
+        day %in% c("Friday") ~ "5",
+        day %in% c("Saturday") ~ "6",
+        day %in% c("Sunday") ~ "7"
+      ),
+      day_id = as.numeric(day_id)
       ) %>%
     pivot_longer(
       activity_1:activity_1440,
-      names_to = "activity_count",
-      values_to = "activity_min"
+      names_to = "activity_min",
+      values_to = "activity_count"
     ) %>% 
-    separate(activity_count, into = c("activity", "activity_count"), sep = "_") %>% 
+    separate(activity_min, into = c("activity", "activity_min"), sep = "_") %>% 
     select(-activity) %>% 
-    mutate(activity_count = as.numeric(activity_count)) %>% 
+    mutate(activity_min = as.numeric(activity_min)) %>% 
     mutate(
     week_type = case_when(
       day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") ~ "Weekday",
       day %in% c("Saturday", "Sunday") ~ "Weekend",
       TRUE ~ ""
-    )
+    ),
+    day = forcats::fct_relevel(day, c("Monday", "Tuesday", "Wednesday","Thursday", "Friday","Saturday", "Sunday"))
   ))
 ```
 
@@ -135,13 +146,26 @@ Traditional analyses of accelerometer data focus on the total activity over the 
 ```{r count_and_order5}
 accel_df %>% 
   group_by(week, day) %>% 
-  summarize(mean_activity = mean(activity_min)) %>% 
+  summarize(mean_activity = mean(activity_count)) %>% 
   pivot_wider(
     names_from = day,
     values_from = mean_activity
   ) %>% 
-  relocate(week, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday) %>% 
   knitr::kable()
 ```
 
-On average it seems like the mean minutes is higher on Fridays. 
+On average it seems like the mean minutes is higher on Fridays. Saturday and Sunday in week 4 and 5 are relatively lower than the other 3 weeks.  
+
+### Part 3 
+
+```{r}
+accel_df %>%
+  group_by(day_id) %>% 
+  ggplot(aes(x = activity_min, y = activity_count, group = day_id, color = day)) +
+  scale_x_continuous(name = "Minutes in a day", limits = c(0, 1440)) +
+  geom_point() +
+  geom_line()
+```
+
+
+
