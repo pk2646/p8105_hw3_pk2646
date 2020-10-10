@@ -86,7 +86,7 @@ instacart %>%
 
 Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 
-```{r}
+```{r count_and_order_4}
 instacart %>% 
   filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>% 
   group_by(product_name, order_dow) %>% 
@@ -97,5 +97,34 @@ instacart %>%
   ) %>% 
   knitr::kable()
 ```
+
+## Problem 2 
+
+### Part 1 
+
+```{r read_and_clean_data_1}
+accel_df = (
+  read_csv(file = "./data/accel_data.csv") %>% 
+  janitor::clean_names() %>% 
+    mutate(day = as.factor(day)) %>%
+    pivot_longer(
+      activity_1:activity_1440,
+      names_to = "activity_count",
+      values_to = "activity_min"
+    ) %>% 
+    separate(activity_count, into = c("activity", "activity_count"), sep = "_") %>% 
+    select(-activity) %>% 
+    mutate(activity_count = as.numeric(activity_count)) %>% 
+    mutate(
+    week_type = case_when(
+      day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") ~ "Weekday",
+      day %in% c("Saturday", "Sunday") ~ "Weekend",
+      TRUE ~ ""
+    )
+  ))
+```
+
+This dataset contains details on accelerometer data recorded among 63 year old males admitted to the advanced cardiac care center at Columbia University Medical Center and diagnosed with congestive heart failure. This dataset contains  `r nrow(accel_df)` observations and `r ncol(accel_df)` variables. The variable names are `r names(accel_df)`. The observations are recorded for five weeks and the weeks are numbered from 1 to 5. The key variable of interest are activity_count and activity_min that give us information on the activity counts for each minute of a 24-hour day starting at midnight.
+
 
 
