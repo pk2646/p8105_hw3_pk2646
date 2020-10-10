@@ -106,7 +106,9 @@ instacart %>%
 accel_df = (
   read_csv(file = "./data/accel_data.csv") %>% 
   janitor::clean_names() %>% 
-    mutate(day = as.factor(day)) %>%
+    mutate(
+      day = as.factor(day),
+      ) %>%
     pivot_longer(
       activity_1:activity_1440,
       names_to = "activity_count",
@@ -126,5 +128,20 @@ accel_df = (
 
 This dataset contains details on accelerometer data recorded among 63 year old males admitted to the advanced cardiac care center at Columbia University Medical Center and diagnosed with congestive heart failure. This dataset contains  `r nrow(accel_df)` observations and `r ncol(accel_df)` variables. The variable names are `r names(accel_df)`. The observations are recorded for five weeks and the weeks are numbered from 1 to 5. The key variable of interest are activity_count and activity_min that give us information on the activity counts for each minute of a 24-hour day starting at midnight.
 
+### Part 2 
 
+Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate across minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
 
+```{r count_and_order5}
+accel_df %>% 
+  group_by(week, day) %>% 
+  summarize(mean_activity = mean(activity_min)) %>% 
+  pivot_wider(
+    names_from = day,
+    values_from = mean_activity
+  ) %>% 
+  relocate(week, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday) %>% 
+  knitr::kable()
+```
+
+On average it seems like the mean minutes is higher on Fridays. 
