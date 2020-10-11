@@ -110,18 +110,7 @@ accel_df = (
   read_csv(file = "./data/accel_data.csv") %>% 
   janitor::clean_names() %>% 
     mutate(
-      day = as.factor(day),
-      day_id = case_when(
-        day %in% c("Monday") ~ "1",
-        day %in% c("Tuesday") ~ "2",
-        day %in% c("Wednesday") ~ "3",
-        day %in% c("Thursday") ~ "4",
-        day %in% c("Friday") ~ "5",
-        day %in% c("Saturday") ~ "6",
-        day %in% c("Sunday") ~ "7"
-      ),
-      day_id = as.numeric(day_id)
-      ) %>%
+      day = as.factor(day)) %>% 
     pivot_longer(
       activity_1:activity_1440,
       names_to = "activity_min",
@@ -149,26 +138,29 @@ Traditional analyses of accelerometer data focus on the total activity over the 
 ```{r count_and_order5}
 accel_df %>% 
   group_by(week, day) %>% 
-  summarize(mean_activity = mean(activity_count)) %>% 
+  summarize(total_activity = sum(activity_count)) %>% 
   pivot_wider(
     names_from = day,
-    values_from = mean_activity
+    values_from = total_activity
   ) %>% 
   knitr::kable()
 ```
 
-On average it seems like the mean minutes is higher on Fridays. Saturday and Sunday in week 4 and 5 are relatively lower than the other 3 weeks.  
+The weekends seem to have lower activities than the weekday. 
 
 ### Part 3 
 
 ```{r graph_1}
 accel_df %>%
-  group_by(day_id) %>% 
-  ggplot(aes(x = activity_min, y = activity_count, group = day_id, color = day)) +
+  group_by(day, week, activity_min) %>%
+  summarize(total_activity = sum(activity_count)) %>% 
+  ggplot(aes(x = activity_min, y = total_activity, color = day)) +
   scale_x_continuous(name = "Minutes in a day", limits = c(0, 1440)) +
   geom_point() +
   geom_line()
 ```
+
+The graph shows that activity on Sunday is highest during the midday and for Friday activity is highest during the end of the day. We can't appreciate the differences between the different weeks in this plot.  
 
 ## Problem 3 
 
@@ -179,7 +171,7 @@ data("ny_noaa")
 summary(ny_noaa)
 ```
 
-The NOAA dataset contains `r nrow(ny_noaa)` observations and `r ncol(ny_noaa)` variables. The names of the variables are `r names(ny_noaa)`. The key variables of interest are prcp, snow, tmax and tmin. There are 145838 missing data in the prcp column, 381221 missing data in the snow coloumn and 591786 missing data in the snwd column. The high number of missing variables needs to be taken into account when we go ahead with data wrangling. 
+The NOAA dataset contains `r nrow(ny_noaa)` observations and `r ncol(ny_noaa)` variables. The names of the variables are `r names(ny_noaa)`. The key variables of interest are prcp, snow, tmax and tmin. There are 145838 missing data in the prcp column, 381221 missing data in the snow coloumn and 591786 missing data in the snwd column. The high number of missing variables needs to be taken into account when we go ahead with data wrangling or plotting. 
 
 ### Part 2 
 
@@ -206,7 +198,7 @@ ny_noaa_df %>%
   arrange(desc(n))
 ```
 
-Fo snowfall the three most commonly observed values are 25 (31022 values), 13(23095 values) and 51(18274 values). (Exclusing the times there were no snowfall and the missing values)
+For snowfall the three most commonly observed values are 25 (31022 values), 13(23095 values) and 51(18274 values). (Excluding the times there were no snowfall, which was the highest observations indicating that there was no snowfall most of the time and the missing values)
 
 ### Part 3 
 
